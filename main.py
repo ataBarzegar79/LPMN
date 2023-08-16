@@ -2,7 +2,19 @@ from graph import Graph
 import networkx as nx
 from sklearn.metrics.cluster import normalized_mutual_info_score
 
-g = Graph('./samples/football.gml')
+datasets = [
+    './samples/football.gml',
+    './samples/dolphins.gml',
+    './samples/karate.gml',
+    './samples/polbooks.gml',
+]
+
+ground_truth_data = [
+    './samples/grand_truth/football_real_labels.txt',
+    './samples/grand_truth/dolphins_real_labels.txt',
+    './samples/grand_truth/karate_real_labels.txt',
+    './samples/grand_truth/polbooks_real_labels.txt',
+]
 
 
 def get_important_nodes():
@@ -68,7 +80,6 @@ def do_the_algorithm():
         for node in nodes_based_on_importance:
             new_label = get_new_label_of_node(node[0])
             g.set_label_to_node(new_label, node[0])
-    g.draw_graph()
 
 
 def calculate_nmi():
@@ -80,14 +91,20 @@ def calculate_nmi():
     return predicted_labels
 
 
-def get_real_results():
-    file_path = './samples/grand_truth/football_real_labels.txt'
-    with open(file_path, 'r') as file:
+def get_real_results(path):
+    with open(path, 'r') as file:
         # Read each line, convert to int, and add to a list
         numbers_list = [int(line.strip()) for line in file]
     return numbers_list
 
 
-do_the_algorithm()
-print("NMI :   ", normalized_mutual_info_score(get_real_results(), calculate_nmi()))
-print("MOD :   ", g.calculate_modularity())
+data_set_counter = 0
+for data_set in datasets:
+    g = Graph(data_set)
+    do_the_algorithm()
+    print('results for dataset : ', data_set)
+    print("NMI :   ",
+          normalized_mutual_info_score(get_real_results(ground_truth_data[data_set_counter]), calculate_nmi()))
+    print("MOD :   ", g.calculate_modularity())
+    print('\n' * 1)
+    data_set_counter += 1
