@@ -93,7 +93,6 @@ def calculate_nmi():
 
 def get_real_results(path):
     with open(path, 'r') as file:
-        # Read each line, convert to int, and add to a list
         numbers_list = [int(line.strip()) for line in file]
     return numbers_list
 
