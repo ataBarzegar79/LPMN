@@ -1,5 +1,3 @@
-from typing import Set, Any
-
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -81,7 +79,7 @@ class Graph:
             colors_as_label.append(label_color)
         return colors_as_label
 
-    def get_labels(self) -> set[Any]:
+    def get_labels(self):
         labels = set()
         for node in self.get_nodes():
             labels.add(self.get_node_current_label(node))
