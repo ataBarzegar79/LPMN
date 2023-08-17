@@ -38,8 +38,7 @@ def get_maximum_label(node):
     for neighbor in node_neighbors:
         mutual_neighbors = set(g.get_node_neighbours(node))
         mutual_neighbors.update(g.get_node_neighbours(neighbor))
-        neighbors_score[neighbor] = \
-            g.get_node_degree(node) + 2 * len(mutual_neighbors)
+        neighbors_score[neighbor] = len(mutual_neighbors)
     max_value = max(neighbors_score.values())
     keys_with_max_value = [key for key, value in neighbors_score.items() if value == max_value]
     if len(keys_with_max_value) > 1:
