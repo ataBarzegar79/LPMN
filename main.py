@@ -1,3 +1,5 @@
+import networkx
+
 from graph import Graph
 from hub_lpa import HubLpa
 from sklearn.metrics.cluster import normalized_mutual_info_score
@@ -37,10 +39,12 @@ if __name__ == "__main__":
         g = Graph(data_set)
         lpa = HubLpa(g)
         lpa.perform_algorithm()
-        g.draw_graph()
+        # g.draw_graph()
         print('results for dataset : ', data_set)
         print("NMI :   ",
               normalized_mutual_info_score(get_real_results(ground_truth_data[data_set_counter]), calculate_nmi()))
         print("MOD :   ", g.calculate_modularity())
+        print('number of labels:', len(g.get_labels()))
+        print('number of nodes:', len(g.get_nodes()))
         print('\n' * 1)
         data_set_counter += 1
