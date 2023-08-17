@@ -19,7 +19,6 @@ ground_truth_data = [
 
 def get_important_nodes():
     nodes = g.get_nodes()
-    nodes = g.get_nodes()
     nodes_betweenness = nx.betweenness_centrality(g.graph)
     nodes_importance = dict()
     for node in nodes:
@@ -71,6 +70,11 @@ def get_new_label_of_node(node):
         return keys_with_max_value[0]
 
 
+def check_mergebility():
+
+    pass  # ehsan
+
+
 def do_the_algorithm():
     nodes = g.get_nodes()
     for node in nodes:
@@ -80,6 +84,7 @@ def do_the_algorithm():
         for node in nodes_based_on_importance:
             new_label = get_new_label_of_node(node[0])
             g.set_label_to_node(new_label, node[0])
+    check_mergebility()
 
 
 def calculate_nmi():
@@ -97,13 +102,14 @@ def get_real_results(path):
     return numbers_list
 
 
-data_set_counter = 0
-for data_set in datasets:
-    g = Graph(data_set)
-    do_the_algorithm()
-    print('results for dataset : ', data_set)
-    print("NMI :   ",
-          normalized_mutual_info_score(get_real_results(ground_truth_data[data_set_counter]), calculate_nmi()))
-    print("MOD :   ", g.calculate_modularity())
-    print('\n' * 1)
-    data_set_counter += 1
+if __name__ == "__main__":
+    data_set_counter = 0
+    for data_set in datasets:
+        g = Graph(data_set)
+        do_the_algorithm()
+        print('results for dataset : ', data_set)
+        print("NMI :   ",
+              normalized_mutual_info_score(get_real_results(ground_truth_data[data_set_counter]), calculate_nmi()))
+        print("MOD :   ", g.calculate_modularity())
+        print('\n' * 1)
+        data_set_counter += 1
