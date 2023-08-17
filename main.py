@@ -1,6 +1,7 @@
 from graph import Graph
 from hub_lpa import HubLpa
 from sklearn.metrics.cluster import normalized_mutual_info_score
+from lfr import Lfr
 
 datasets = [
     './samples/football.gml',
@@ -32,15 +33,19 @@ def get_real_results(path):
 
 
 if __name__ == "__main__":
-    data_set_counter = 0
-    for data_set in datasets:
-        g = Graph(data_set)
-        lpa = HubLpa(g)
-        lpa.perform_algorithm()
-        g.draw_graph()
-        print('results for dataset : ', data_set)
-        print("NMI :   ",
-              normalized_mutual_info_score(get_real_results(ground_truth_data[data_set_counter]), calculate_nmi()))
-        print("MOD :   ", g.calculate_modularity())
-        print('\n' * 1)
-        data_set_counter += 1
+    # data_set_counter = 0
+    # for data_set in datasets:
+    #     g = Graph(data_set)
+    #     lpa = HubLpa(g)
+    #     lpa.perform_algorithm()
+    #     g.draw_graph()
+    #     print('results for dataset : ', data_set)
+    #     print("NMI :   ",
+    #           normalized_mutual_info_score(get_real_results(ground_truth_data[data_set_counter]), calculate_nmi()))
+    #     print("MOD :   ", g.calculate_modularity())
+    #     print('\n' * 1)
+    #     data_set_counter += 1
+    lfr = Lfr('./samples/lfr/1k-network.dat', './samples/lfr/1k-community.dat')
+    g = Graph(lfr.initialize_networkx_graph())
+    lpa = HubLpa(g)
+    lpa.perform_algorithm()

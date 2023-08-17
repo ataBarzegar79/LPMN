@@ -8,9 +8,12 @@ import matplotlib.pyplot as plt
 class Graph:
 
     def __init__(self, graph_file_path):
-        self.graph = None
-        self.graph_file_path = graph_file_path
-        self.read_graph_from_path()
+        if isinstance(graph_file_path, str):
+            self.graph = None
+            self.graph_file_path = graph_file_path
+            self.read_graph_from_path()
+        else:
+            self.graph = graph_file_path
         self.colors = ['#C0C0C0', '#FF0000', '#800080', '#00FF00', '#faebd7',
                        '#d2691e', '#00ffff', '#bdb76b', '#9932cc', '#ff1493',
                        '#ffd700', '#ff69b4', '#4b0082', '#7cfc00', '#ffa07a',
