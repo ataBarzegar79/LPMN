@@ -1,6 +1,4 @@
 from graph import Graph
-import networkx as nx
-
 
 class HubLpa:
     def __init__(self, graph: Graph):
@@ -10,25 +8,32 @@ class HubLpa:
         nodes = self.graph.get_nodes()
         for node in nodes:  # label initialization  => O(n)
             self.graph.set_label_to_node(label=node, node=node)
-
         nodes_based_on_importance = self.get_important_nodes(nodes=nodes)  # => O(nk)
-
-        for item in range(10):  # => O(nk)
+        counter = 0
+        while True:
+            LABELS_BEFORE = [self.graph.get_node_current_label(node) for node in nodes]
+            counter += 1
             for node in nodes_based_on_importance:
                 new_label = self.get_new_label_of_node(node[0])
                 self.graph.set_label_to_node(new_label, node[0])
+            LABELS_AFTER = [self.graph.get_node_current_label(node) for node in nodes]
+            if LABELS_BEFORE == LABELS_AFTER:
+                break
+            if counter > 10:
+                break
         self.check_mergeability()
+        return counter
 
     def get_important_nodes(self, nodes):
-        nodes_betweenness = nx.betweenness_centrality(self.graph.graph)
+        # nodes_betweenness = nx.betweenness_centrality(self.graph.graph)
         nodes_importance = dict()
         for node in nodes:
-            node_betweenness = nodes_betweenness[node]
+            # node_betweenness = nodes_betweenness[node]
             node_neighbours = self.graph.get_node_neighbours(node=node)
             rdc = 0
             for neighbour in node_neighbours:
                 rdc += 1 / self.graph.get_node_degree(node=neighbour)
-            nodes_importance[node] = rdc * (1 + node_betweenness)  # finding hub power of each node
+            nodes_importance[node] = rdc  # finding hub power of each node
         return sorted(nodes_importance.items(), key=lambda x: x[1], reverse=True)
 
     def get_new_label_of_node(self, node: int) -> int:
@@ -65,7 +70,7 @@ class HubLpa:
         else:
             return self.graph.get_node_current_label(neighbors_with_maximum_score[0])
 
-    def calculate_dcn(self, node_v, node_i):
+    def calculate_dcn(self, node_v, node_i):  # this is really ok
         degree = self.graph.get_node_degree(node_v)
         neighbors_of_v = self.graph.get_node_neighbours(node_v)
         neighbors_of_i = self.graph.get_node_neighbours(node_i)
@@ -111,7 +116,7 @@ class HubLpa:
 
     def merging_ability(self, inner_edge, outer_edge):
         # print(inner_edge, outer_edge)
-        if (inner_edge / 1.3) - outer_edge <= 1:
+        if (inner_edge / 1.2) - outer_edge <= 1:
             return True
         else:
             return False
