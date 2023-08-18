@@ -1,0 +1,17 @@
+{
+  "data_sets": {
+    "base_datas": {
+      "./samples/datasets/base_datas/dolphins.gml": "./samples/grand_truth/base_datas/dolphins_real_labels.txt",
+      "./samples/datasets/base_datas/football.gml": "./samples/grand_truth/base_datas/football_real_labels.txt",
+      "./samples/datasets/base_datas/karate.gml": "./samples/grand_truth/base_datas/karate_real_labels.txt",
+      "./samples/datasets/base_datas/polbooks.gml": "./samples/grand_truth/base_datas/polbooks_real_labels.txt"
+    },
+    "big_scale_datas": {
+      "./samples/datasets/big_scale_datas/amazon.txt": ""
+    },
+    "lfr": {
+      "./samples/lfr/5k-network.dat": "./samples/lfr/5k-community.dat"
+    }
+  },
+  "data_set_chosen": "BASE"
+}
