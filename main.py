@@ -1,3 +1,5 @@
+import networkx
+
 from graph import Graph
 from hub_lpa import HubLpa
 from sklearn.metrics.cluster import normalized_mutual_info_score
