@@ -1,31 +1,8 @@
-import networkx
-
+import time
+import json
 from graph import Graph
 from hub_lpa import HubLpa
 from sklearn.metrics.cluster import normalized_mutual_info_score
-from lfr import Lfr
-
-datasets = [
-    './samples/football.gml',
-    './samples/dolphins.gml',
-    './samples/karate.gml',
-    './samples/polbooks.gml',
-]
-
-ground_truth_data = [
-    './samples/grand_truth/football_real_labels.txt',
-    './samples/grand_truth/dolphins_real_labels.txt',
-    './samples/grand_truth/karate_real_labels.txt',
-    './samples/grand_truth/polbooks_real_labels.txt',
-]
-
-
-def calculate_nmi():
-    nodes = g.get_nodes()
-    predicted_labels = list()
-    for node in nodes:
-        predicted_labels.append(g.get_node_current_label(node))
-    return predicted_labels
 
 
 def get_real_results(path):
@@ -34,32 +11,38 @@ def get_real_results(path):
     return numbers_list
 
 
+available_datasets = {
+    'BASE': 'base_datas',
+    'LFR': 'lfr',
+    'BIG-SCALE': 'big_scale_datas',
+}
+
+
+def load_datasets():
+    with open('settings.json') as json_file:
+        data = json.load(json_file)
+        chosen_dataset = data['data_set_chosen']
+        return data['data_sets'][available_datasets[chosen_dataset]]
+
+
 if __name__ == "__main__":
-    # data_set_counter = 0
-    # for data_set in datasets:
-    #     g = Graph(data_set)
-    #     lpa = HubLpa(g)
-    #     lpa.perform_algorithm()
-    #     g.draw_graph()
-    #     print('results for dataset : ', data_set)
-    #     print("NMI :   ",
-    #     print("MOD :   ", g.calculate_modularity())
-    #     print('\n' * 1)
-    #     data_set_counter += 1
-    lfr = Lfr('./samples/lfr/1k-network.dat', './samples/lfr/1k-community.dat')
-    g = Graph(lfr.produce_base_network())
-    lpa = HubLpa(g)
-    lpa.perform_algorithm()
-    # g.draw_graph()
-    # print(g.calculate_modularity())
-    # print(calculate_nmi())
-    # print(',,,,,,============')
-    # print(lfr.get_truth_of_lpr())
-    # exit()
-    # g.draw_graph()
-    print(g.calculate_modularity())
-    print(
-        normalized_mutual_info_score(
-            calculate_nmi(),
-            lfr.get_truth_of_lpr()
-        ))
+    datasets = load_datasets().items()
+    for dataset, truth in datasets:
+
+        graph = Graph(dataset)
+        hup_lpa = HubLpa(graph=graph)
+        algorithm_start_time = time.time()
+        iteration_count = hup_lpa.perform_algorithm()
+        algorithm_finish_time = time.time()
+
+        print('data set   : ', dataset)
+        print('algorithm executed in  :', algorithm_finish_time - algorithm_start_time)
+        print('algorithm iteration count : ', iteration_count)
+        print('communities found  : ', len(graph.get_labels()))
+        print('gained modularity  :', graph.calculate_modularity())
+        if len(truth) > 0:
+            print('gained nmi  : ', normalized_mutual_info_score(
+                graph.get_graph_labels(),
+                get_real_results(truth)
+            ))
+        print('------------------------------------------------------' + '\n')
