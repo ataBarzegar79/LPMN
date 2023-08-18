@@ -1,3 +1,5 @@
+import os
+
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -8,6 +10,12 @@ import matplotlib.pyplot as plt
 class Graph:
 
     def __init__(self, graph_file_path):
+        self.file_format_readers = {
+            '.txt': self.read_from_text,
+            '.gml': self.read_from_gml,
+            '.dat': self.read_from_dat,
+        }
+
         if isinstance(graph_file_path, str):
             self.graph = None
             self.graph_file_path = graph_file_path
@@ -67,8 +75,34 @@ class Graph:
         ]
 
     def read_graph_from_path(self):
-        self.graph = nx.read_gml(self.graph_file_path, label='id')
-        return self.graph
+        file_format = os.path.splitext(self.graph_file_path)[1]
+        self.graph = self.file_format_readers[file_format]()
+
+    def read_from_text(self):
+        raw_data = []
+        base_graph = nx.Graph()
+        with open(self.graph_file_path, 'r') as file:
+            for line in file:
+                values = line.strip().split('\t')
+                node = values[0]
+                neighbours = values[1:]
+                raw_data += [(int(node), int(neighbor)) for neighbor in neighbours]
+        base_graph.add_edges_from(raw_data)
+        return base_graph
+
+    def read_from_gml(self):
+        return nx.read_gml(self.graph_file_path, label='id')
+
+    def read_from_dat(self):
+        base_graph = nx.Graph()
+        raw_data = []
+        with open(self.graph_file_path, 'r') as file:
+            for line in file:
+                values = line.strip().split('\t')
+                if len(values) == 2:
+                    raw_data.append((int(values[0]), int(values[1])))
+        base_graph.add_edges_from(raw_data)
+        return base_graph
 
     def get_nodes_and_data(self):
         return self.graph.nodes.data()
@@ -141,3 +175,10 @@ class Graph:
             else:
                 communities[node_current_label].add(node)
         return nx.community.modularity(self.graph, [v for v in communities.values()])
+
+    def get_graph_labels(self):
+        nodes = self.get_nodes()
+        predicted_labels = list()
+        for node in nodes:
+            predicted_labels.append(self.get_node_current_label(node))
+        return predicted_labels
