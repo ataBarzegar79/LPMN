@@ -23,7 +23,7 @@ class HubLpa:
                 break
             if counter > 10:
                 break
-        # self.check_mergeability()
+        self.check_mergeability()
         return counter
 
     def get_important_nodes(self, nodes):
