@@ -23,7 +23,7 @@ class HubLpa:
                 break
             if counter > 10:
                 break
-        self.check_mergeability()
+        # self.check_mergeability()
         return counter
 
     def get_important_nodes(self, nodes):
@@ -32,6 +32,15 @@ class HubLpa:
         for node in nodes:
             # node_betweenness = nodes_betweenness[node]
             node_neighbours = self.graph.get_node_neighbours(node=node)
+
+            # METHOD 1
+            # node_degree = self.graph.get_node_degree(node)
+            # neighbor_amounts = 0
+            # for neighbour in node_neighbours:
+            #     neighbor_amounts += self.graph.get_node_degree(node=neighbour)
+            # nodes_importance[node] = node_degree / neighbor_amounts  # finding hub power of each node
+
+            ###  METHOD 2 :RDC
             rdc = 0
             for neighbour in node_neighbours:
                 rdc += 1 / self.graph.get_node_degree(node=neighbour)
@@ -41,18 +50,18 @@ class HubLpa:
     def get_new_label_of_node(self, node: int) -> int:
         node_neighbors = self.graph.get_node_neighbours(node=node)
         label_count = dict()
-        for neighbor in node_neighbors:
-            label = self.graph.get_node_current_label(node=neighbor)
-            if label not in label_count:
-                label_count[label] = 1
-            else:
-                label_count[label] += 1
-        max_value = max(label_count.values())
-        labels_with_max_value = [label for label, count in label_count.items() if count == max_value]
-        if len(labels_with_max_value) > 1:
-            return self.get_most_appreciate_label(node_neighbors)
-        else:
-            return labels_with_max_value[0]
+        # for neighbor in node_neighbors:
+        #     label = self.graph.get_node_current_label(node=neighbor)
+        #     if label not in label_count:
+        #         label_count[label] = 1
+        #     else:
+        #         label_count[label] += 1
+        # max_value = max(label_count.values())
+        # labels_with_max_value = [label for label, count in label_count.items() if count == max_value]
+        # if len(labels_with_max_value) > 1:
+        return self.get_most_appreciate_label(node_neighbors)
+        # else:
+        #     return labels_with_max_value[0]
 
     def get_most_appreciate_label(self, node_neighbors) -> int:
         neighbors_score = dict()
@@ -64,7 +73,7 @@ class HubLpa:
         neighbors_with_maximum_score = [key for key, value in neighbors_score.items() if value == max_value]
         if len(neighbors_with_maximum_score) > 1:
             max_degree_neighbor = (None, 0)
-            for neighbor in node_neighbors:
+            for neighbor in neighbors_with_maximum_score:
                 neighbor_degree = self.graph.get_node_degree(neighbor)
                 if neighbor_degree > max_degree_neighbor[1]:
                     max_degree_neighbor = (neighbor, neighbor_degree)

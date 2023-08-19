@@ -13,5 +13,5 @@
       "./samples/lfr/5k-network.dat": "./samples/lfr/5k-community.dat"
     }
   },
-  "data_set_chosen": "BASE"
+  "data_set_chosen": "BIG-SCALE"
 }
