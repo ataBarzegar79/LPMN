@@ -23,7 +23,7 @@ class HubLpa:
                 break
             if counter > 10:
                 break
-        self.check_mergeability()
+        # self.check_mergeability()
         return counter
 
     def get_important_nodes(self, nodes):
@@ -101,7 +101,7 @@ class HubLpa:
                 counter += 1
         return counter
 
-    def set_small_community_inner_edge(self, small_communities):  # => O(s_nodes x K)
+    def set_small_community_inner_edge(self, small_communities):
         counter = 0
         for small_community in small_communities:
             for member in small_communities[small_community][0]:
@@ -128,7 +128,7 @@ class HubLpa:
 
     def merging_list(self, merge_candidates):
         need_to_update_list = dict()
-        for candidate in merge_candidates:  # => O(s_nodes*k)
+        for candidate in merge_candidates:
             label_of_large_community = merge_candidates[candidate][3][0]
             all_nodes_in_candidate_community = merge_candidates[candidate][0]
             if self.merging_ability(merge_candidates[candidate][2],
@@ -180,11 +180,14 @@ class HubLpa:
                     candidate_for_large_node_degree = self.graph.get_node_degree(large_node)
             large_community_target_nodes[large_community] = candidate_for_large_node
 
+        # => O(s_nodes * k)
         small_communities_with_inner_edge = self.set_small_community_inner_edge(small_community_target_nodes)
 
+        # => O(c)
         small_communities_with_merge_candidate = self.return_largest_dcn(small_communities_with_inner_edge,
                                                                          large_community_target_nodes)
-
+        # => O(s_nodes*k)
         need_to_update_list = self.merging_list(small_communities_with_merge_candidate)
 
+        # => O(s_nodes) -> worst scenario
         self.merging_operation(need_to_update_list)
