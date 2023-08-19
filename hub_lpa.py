@@ -34,22 +34,22 @@ class HubLpa:
             node_neighbours = self.graph.get_node_neighbours(node=node)
 
             # METHOD 1
-            # node_degree = self.graph.get_node_degree(node)
-            # neighbor_amounts = 0
-            # for neighbour in node_neighbours:
-            #     neighbor_amounts += self.graph.get_node_degree(node=neighbour)
-            # nodes_importance[node] = node_degree / neighbor_amounts  # finding hub power of each node
+            node_degree = self.graph.get_node_degree(node)
+            neighbor_amounts = 0
+            for neighbour in node_neighbours:
+                neighbor_amounts += self.graph.get_node_degree(node=neighbour)
+            nodes_importance[node] = node_degree / neighbor_amounts  # finding hub power of each node
 
             ###  METHOD 2 :RDC
-            rdc = 0
-            for neighbour in node_neighbours:
-                rdc += 1 / self.graph.get_node_degree(node=neighbour)
-            nodes_importance[node] = rdc  # finding hub power of each node
+            # rdc = 0
+            # for neighbour in node_neighbours:
+            #     rdc += 1 / self.graph.get_node_degree(node=neighbour)
+            # nodes_importance[node] = rdc  # finding hub power of each node
         return sorted(nodes_importance.items(), key=lambda x: x[1], reverse=True)
 
     def get_new_label_of_node(self, node: int) -> int:
         node_neighbors = self.graph.get_node_neighbours(node=node)
-        label_count = dict()
+        # label_count = dict()
         # for neighbor in node_neighbors:
         #     label = self.graph.get_node_current_label(node=neighbor)
         #     if label not in label_count:
@@ -130,7 +130,7 @@ class HubLpa:
         return counter
 
     def merging_ability(self, inner_edge, outer_edge):
-        if (inner_edge / 2) - outer_edge <= 1:
+        if (inner_edge / 1.3) - outer_edge <= 1:
             return True
         else:
             return False
