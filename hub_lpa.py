@@ -132,7 +132,6 @@ class HubLpa:
         return counter
 
     def merging_ability(self, inner_edge, outer_edge):
-        print(inner_edge, outer_edge)
         if (inner_edge / 2) - outer_edge <= 1:
             return True
         else:
@@ -145,7 +144,12 @@ class HubLpa:
             all_nodes_in_candidate_community = merge_candidates[candidate][0]
             if self.merging_ability(merge_candidates[candidate][2],
                                     self.get_outer_edge(all_nodes_in_candidate_community, label_of_large_community)):
-                need_to_update_list[label_of_large_community] = merge_candidates[candidate][0]
+                if label_of_large_community in need_to_update_list:
+                    need_to_update_list[label_of_large_community] += merge_candidates[candidate][0]
+                else:
+                    need_to_update_list[label_of_large_community] = merge_candidates[candidate][0]
+
+        # print(need_to_update_list)
         return need_to_update_list
 
     def merging_operation(self, merging_list):
@@ -203,9 +207,9 @@ class HubLpa:
         # => O(s_nodes*k)
         need_to_update_list = self.merging_list(small_communities_with_merge_candidate)
 
-        print(small_communities, '\n')
-        print(need_to_update_list)
-        exit()
+        # print(small_communities, '\n')
+        # print(need_to_update_list)
+        # exit()
         # => O(s_nodes) -> worst scenario
         self.merging_operation(need_to_update_list)
         # print(communities)
