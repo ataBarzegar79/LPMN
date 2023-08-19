@@ -1,4 +1,6 @@
+import graph
 from graph import Graph
+
 
 class HubLpa:
     def __init__(self, graph: Graph):
@@ -79,13 +81,16 @@ class HubLpa:
         return degree + (2 * common_neighbors_count)
 
     def return_largest_dcn(self, list1, list2):
-        dcn_values = dict()
         for l1 in list1:
             max_dcn = 0
             for l2 in list2:
-                if self.calculate_dcn(l1, l2) >= max_dcn:
-                    dcn_values[list1[l1]] = list2[l2]
-        return dcn_values
+                if self.calculate_dcn(list1[l1][1], list2[l2]) >= max_dcn:
+                    length = len(list1[l1])
+                    if length == 3:
+                        list1[l1].append([l2, list2[l2]])
+                    else:
+                        list1[l1][length - 1] = [l2, list2[l2]]
+        return list1
 
     def get_inner_edge(self, node):
         target_node_current_label = self.graph.get_node_current_label(node)
@@ -96,43 +101,45 @@ class HubLpa:
                 counter += 1
         return counter
 
-    def get_outer_edge(self, node_v, node_i):
-        target_node_v_current_label = self.graph.get_node_current_label(node_v)
-        target_node_i_current_label = self.graph.get_node_current_label(node_i)
-        all_nodes_in_node_v_community = {node_v}
-        for node in self.graph.get_nodes():
-            if self.graph.get_node_current_label(node) == target_node_v_current_label:
-                all_nodes_in_node_v_community.add(node)
-        all_nodes_in_node_i_community = {node_i}
-        for node in self.graph.get_nodes():
-            if self.graph.get_node_current_label(node) == target_node_i_current_label:
-                all_nodes_in_node_i_community.add(node)
+    def set_small_community_inner_edge(self, small_communities):  # => O(s_nodes x K)
         counter = 0
-        for target_node_v in all_nodes_in_node_v_community:
-            for target_node_i in all_nodes_in_node_i_community:
-                if target_node_i in self.graph.get_node_neighbours(target_node_v):
+        for small_community in small_communities:
+            for member in small_communities[small_community][0]:
+                neighbors = self.graph.get_node_neighbours(member)
+                for neighbor in neighbors:
+                    if self.graph.get_node_current_label(neighbor) == small_community:
+                        counter += 1
+            small_communities[small_community].append(counter / 2)
+        return small_communities
+
+    def get_outer_edge(self, nodes, label):
+        counter = 0
+        for node in nodes:
+            for neighbor in self.graph.get_node_neighbours(node):
+                if self.graph.get_node_current_label(neighbor) == label:
                     counter += 1
         return counter
 
     def merging_ability(self, inner_edge, outer_edge):
-        # print(inner_edge, outer_edge)
-        if (inner_edge / 1.2) - outer_edge <= 1:
+        if (inner_edge / 2) - outer_edge <= 1:
             return True
         else:
             return False
 
-    def merging_operation(self, merge_candidate_nodes):
-        for candidate in merge_candidate_nodes:
-            candidate_label = self.graph.get_node_current_label(candidate)
-            label_of_large_community = self.graph.get_node_current_label(merge_candidate_nodes.get(candidate))
-            all_nodes_in_candidate_community = {candidate}
-            for node in self.graph.get_nodes():
-                if self.graph.get_node_current_label(node) == candidate_label:
-                    all_nodes_in_candidate_community.add(node)
-            if self.merging_ability(self.get_inner_edge(candidate),
-                                    self.get_outer_edge(candidate, merge_candidate_nodes.get(candidate))):
-                for candidate_node in all_nodes_in_candidate_community:
-                    self.graph.set_label_to_node(label_of_large_community, candidate_node)
+    def merging_list(self, merge_candidates):
+        need_to_update_list = dict()
+        for candidate in merge_candidates:  # => O(s_nodes*k)
+            label_of_large_community = merge_candidates[candidate][3][0]
+            all_nodes_in_candidate_community = merge_candidates[candidate][0]
+            if self.merging_ability(merge_candidates[candidate][2],
+                                    self.get_outer_edge(all_nodes_in_candidate_community, label_of_large_community)):
+                need_to_update_list[label_of_large_community] = merge_candidates[candidate][0]
+        return need_to_update_list
+
+    def merging_operation(self, merging_list):
+        for label in merging_list:
+            for node in merging_list[label]:
+                self.graph.set_label_to_node(label, node)
 
     def check_mergeability(self):
         communities = dict()
@@ -157,11 +164,12 @@ class HubLpa:
         small_community_target_nodes = dict()  # one node from each small community with the biggest degree
         for small_community in small_communities:
             candidate_for_target_node_degree = 0
+            small_community_target_nodes[small_community] = [small_communities[small_community]]
             for small_node in small_communities[small_community]:
                 if self.graph.get_node_degree(small_node) >= candidate_for_target_node_degree:
                     candidate_for_target_node = small_node
                     candidate_for_target_node_degree = self.graph.get_node_degree(small_node)
-            small_community_target_nodes[small_community] = candidate_for_target_node
+            small_community_target_nodes[small_community].append(candidate_for_target_node)
 
         large_community_target_nodes = dict()  # one node from each large community with the biggest degree
         for large_community in large_communities:
@@ -172,6 +180,11 @@ class HubLpa:
                     candidate_for_large_node_degree = self.graph.get_node_degree(large_node)
             large_community_target_nodes[large_community] = candidate_for_large_node
 
-        merge_candidate_nodes = self.return_largest_dcn(small_community_target_nodes, large_community_target_nodes)
+        small_communities_with_inner_edge = self.set_small_community_inner_edge(small_community_target_nodes)
 
-        self.merging_operation(merge_candidate_nodes)
+        small_communities_with_merge_candidate = self.return_largest_dcn(small_communities_with_inner_edge,
+                                                                         large_community_target_nodes)
+
+        need_to_update_list = self.merging_list(small_communities_with_merge_candidate)
+
+        self.merging_operation(need_to_update_list)
