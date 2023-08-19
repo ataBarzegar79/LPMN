@@ -93,7 +93,9 @@ class HubLpa:
         for l1 in list1:
             max_dcn = 0
             for l2 in list2:
-                if self.calculate_dcn(list1[l1][1], list2[l2]) >= max_dcn:
+                calculated_dcn = self.calculate_dcn(list1[l1][1], list2[l2])
+                if calculated_dcn > max_dcn:
+                    max_dcn = calculated_dcn
                     length = len(list1[l1])
                     if length == 3:
                         list1[l1].append([l2, list2[l2]])
@@ -130,6 +132,7 @@ class HubLpa:
         return counter
 
     def merging_ability(self, inner_edge, outer_edge):
+        print(inner_edge, outer_edge)
         if (inner_edge / 2) - outer_edge <= 1:
             return True
         else:
@@ -195,8 +198,15 @@ class HubLpa:
         # => O(c)
         small_communities_with_merge_candidate = self.return_largest_dcn(small_communities_with_inner_edge,
                                                                          large_community_target_nodes)
+        # print(small_communities_with_merge_candidate)
+        # exit()
         # => O(s_nodes*k)
         need_to_update_list = self.merging_list(small_communities_with_merge_candidate)
 
+        print(small_communities, '\n')
+        print(need_to_update_list)
+        exit()
         # => O(s_nodes) -> worst scenario
         self.merging_operation(need_to_update_list)
+        # print(communities)
+        # self.graph.draw_graph()
