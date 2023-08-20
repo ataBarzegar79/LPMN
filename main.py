@@ -10,6 +10,7 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 from networkx.generators.community import LFR_benchmark_graph
 from collections import Counter
 
+
 def get_real_results(path):
     with open(path, 'r') as file:
         numbers_list = [int(line.strip()) for line in file]
@@ -88,5 +89,3 @@ if __name__ == "__main__":
     #         real_results
     #     ))
     # print('------------------------------------------------------' + '\n')
-
-
