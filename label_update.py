@@ -2,8 +2,8 @@ import networkx as nx
 
 
 class LabelUpdate:
-    def retrieve_new_label(self, node, graph):
-        return self.method_two(graph, node)
+    def retrieve_new_label(self, node, graph, clustering: dict, page_rank: dict):
+        return self.method_two(graph, node,clustering,page_rank)
         # return self.method_one(graph, node)
 
     def method_one(self, graph, node):
@@ -22,9 +22,7 @@ class LabelUpdate:
         else:
             return labels_with_max_value[0]
 
-    def method_two(self, graph, node) -> int:
-        clustering = nx.clustering(graph.graph)
-        page_rank = nx.pagerank(graph.graph)
+    def method_two(self, graph, node, clustering: dict, page_rank: dict) -> int:
         node_neighbors = graph.get_node_neighbours(node=node)
         neighbors_score = dict()
         for neighbor in node_neighbors:
@@ -36,10 +34,10 @@ class LabelUpdate:
         if len(neighbors_with_maximum_score) > 1:
             if self.check_maximum_values_are_zero(neighbors_with_maximum_score, neighbors_score):
                 new_scores = dict()
-                sum = 0
+                # sum = 0
                 for neighbor in neighbors_with_maximum_score:
-                    for second_neighbor in graph.get_node_neighbours(neighbor):
-                        sum += clustering[second_neighbor]
+                    # for second_neighbor in graph.get_node_neighbours(neighbor):
+                    #     sum += clustering[second_neighbor]
                     new_scores[neighbor] = page_rank[neighbor] ** (clustering[neighbor] + 1)
                 max_score = max(new_scores.values())
                 neighbors_with_maximum_score = [key for key, value in new_scores.items() if value == max_score]

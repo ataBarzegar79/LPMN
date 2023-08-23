@@ -1,9 +1,9 @@
+import networkx as nx
 import graph
 import merge_phase
 from graph import Graph
 from prioroty import Priority
 from label_update import LabelUpdate
-
 
 
 class HubLpa:
@@ -15,12 +15,14 @@ class HubLpa:
         for node in nodes:  # label initialization  => O(n)
             self.graph.set_label_to_node(label=node, node=node)
         nodes_based_on_importance = self.get_important_nodes(nodes=nodes)  # => O(nk)
+        clustering = nx.clustering(self.graph.graph)
+        page_rank = nx.pagerank(self.graph.graph)
         counter = 0
         while True:
             LABELS_BEFORE = [self.graph.get_node_current_label(node) for node in nodes]
             counter += 1
             for node in nodes_based_on_importance:
-                new_label = self.get_new_label_of_node(node[0])
+                new_label = self.get_new_label_of_node(node[0], clustering, page_rank)
                 self.graph.set_label_to_node(new_label, node[0])
             LABELS_AFTER = [self.graph.get_node_current_label(node) for node in nodes]
             if LABELS_BEFORE == LABELS_AFTER:
@@ -34,6 +36,6 @@ class HubLpa:
         priority = Priority()
         return priority.give_nodes_priority(self.graph)
 
-    def get_new_label_of_node(self, node: int) -> int:
+    def get_new_label_of_node(self, node: int, clustering: dict, page_rank: dict) -> int:
         label_update = LabelUpdate()
-        return label_update.retrieve_new_label(node, self.graph)
+        return label_update.retrieve_new_label(node, self.graph,clustering,page_rank)
