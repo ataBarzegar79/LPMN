@@ -1,3 +1,6 @@
+import networkx as nx
+
+
 class LabelUpdate:
     def retrieve_new_label(self, node, graph):
         return self.method_two(graph, node)
@@ -20,6 +23,8 @@ class LabelUpdate:
             return labels_with_max_value[0]
 
     def method_two(self, graph, node) -> int:
+        clustering = nx.clustering(graph.graph)
+        page_rank = nx.pagerank(graph.graph)
         node_neighbors = graph.get_node_neighbours(node=node)
         neighbors_score = dict()
         for neighbor in node_neighbors:
@@ -29,11 +34,28 @@ class LabelUpdate:
         max_value = max(neighbors_score.values())
         neighbors_with_maximum_score = [key for key, value in neighbors_score.items() if value == max_value]
         if len(neighbors_with_maximum_score) > 1:
-            max_degree_neighbor = (None, 0)
-            for neighbor in neighbors_with_maximum_score:
-                neighbor_degree = graph.get_node_degree(neighbor)
-                if neighbor_degree > max_degree_neighbor[1]:
-                    max_degree_neighbor = (neighbor, neighbor_degree)
-            return graph.get_node_current_label(max_degree_neighbor[0])
+            if self.check_maximum_values_are_zero(neighbors_with_maximum_score, neighbors_score):
+                new_scores = dict()
+                sum = 0
+                for neighbor in neighbors_with_maximum_score:
+                    for second_neighbor in graph.get_node_neighbours(neighbor):
+                        sum += clustering[second_neighbor]
+                    new_scores[neighbor] = page_rank[neighbor] ** (clustering[neighbor] + 1)
+                max_score = max(new_scores.values())
+                neighbors_with_maximum_score = [key for key, value in new_scores.items() if value == max_score]
+                return graph.get_node_current_label(neighbors_with_maximum_score[0])
+            else:
+                max_degree_neighbor = (None, 0)
+                for neighbor in neighbors_with_maximum_score:
+                    neighbor_degree = graph.get_node_degree(neighbor)
+                    if neighbor_degree > max_degree_neighbor[1]:
+                        max_degree_neighbor = (neighbor, neighbor_degree)
+                return graph.get_node_current_label(max_degree_neighbor[0])
         else:
             return graph.get_node_current_label(neighbors_with_maximum_score[0])
+
+    def check_maximum_values_are_zero(self, neighbors_with_maximum_score: list, neighbors_score: dict) -> bool:
+        for key in neighbors_with_maximum_score:
+            if neighbors_score[key] != 0:
+                return False
+        return True
