@@ -12,52 +12,59 @@ def merge_algorithm(graph: Graph):
     large_communities = get_large_communities(nodes, communities)
 
     # => O(s_nodes * k)
-    small_communities_with_inner_edge = set_small_community_inner_edge(
-        small_community_target_nodes(small_communities, graph), graph)
+    # small_communities_with_inner_edge = get_small_community_inner_edge(
+    #     small_community_target_nodes(small_communities, graph), graph)
 
-    current_small_community = small_communities_with_inner_edge[list(small_communities_with_inner_edge.keys())[0]]
+    # current_small_community = small_communities_with_inner_edge[list(small_communities_with_inner_edge.keys())[0]]
 
     # => O(l_nodes)
-    current_large_community = large_community_target_nodes(large_communities, graph)
+    # current_large_community = large_community_target_nodes(large_communities, graph)
 
     condition = True
     iter_limitation = len(small_communities)
     item_key = 0
 
-    # = >
+    small_community_label = list(small_communities.keys())[item_key]
+    small_community = small_communities[small_community_label]
+    target_node = small_community_target_nodes(small_community, graph)
+    inner_edge = get_small_community_inner_edge(small_community, small_community_label, graph)
+
+    target_node_of_large_communities = large_community_target_nodes(large_communities, graph)
+
     while condition:
         # => O(c)
-        small_community_with_merge_candidate = return_largest_dcn(current_small_community, current_large_community,
-                                                                  graph)
+        large_community_label = return_largest_dcn(target_node, target_node_of_large_communities, graph)
         # => O(s_nodes*k)
-        need_to_update_list = merging_list(small_community_with_merge_candidate, graph)
+        need_to_update_list = merging_list(small_community, large_community_label, inner_edge, graph)
 
         if need_to_update_list:
             # => O(s_nodes) -> worst scenario
             merging_operation(need_to_update_list, graph)
 
-            # => O(n)
-            communities = get_communities(nodes, graph)
+            communities[large_community_label] += need_to_update_list[large_community_label]
+            communities.pop(small_community_label)
 
             # => O(c)
             small_communities = get_small_communities(nodes, communities)
             large_communities = get_large_communities(nodes, communities)
 
-            # => O(s_nodes * k)
-            small_communities_with_inner_edge = set_small_community_inner_edge(
-                small_community_target_nodes(small_communities, graph), graph)
-
-            if len(small_communities_with_inner_edge) > item_key:
-                current_small_community = small_communities_with_inner_edge[
-                    list(small_communities_with_inner_edge.keys())[item_key]]
-            current_large_community = large_community_target_nodes(large_communities, graph)
             iter_limitation = len(small_communities)
             item_key = 0
+            small_community_label = list(small_communities.keys())[item_key]
+            small_community = small_communities[small_community_label]
+            target_node = small_community_target_nodes(small_community, graph)
+            inner_edge = get_small_community_inner_edge(small_community, small_community_label, graph)
+
+            target_node_of_large_communities = large_community_target_nodes(large_communities, graph)
         else:
             item_key += 1
-            if len(small_communities_with_inner_edge) > item_key:
-                current_small_community = small_communities_with_inner_edge[
-                    list(small_communities_with_inner_edge.keys())[item_key]]
+            if len(small_communities) > item_key:
+                small_community_label = list(small_communities.keys())[item_key]
+                small_community = small_communities[small_community_label]
+                target_node = small_community_target_nodes(small_community, graph)
+                inner_edge = get_small_community_inner_edge(small_community, small_community_label, graph)
+
+                target_node_of_large_communities = large_community_target_nodes(large_communities, graph)
             iter_limitation -= 1
         if iter_limitation == 0:
             condition = False
@@ -72,30 +79,27 @@ def calculate_dcn(node_v, node_i, graph: Graph):  # this is really ok
     return degree + (2 * common_neighbors_count)
 
 
-def return_largest_dcn(list1, list2, graph: Graph):
+def return_largest_dcn(target_node, large_community_with_target_node, graph: Graph):
     max_dcn = 0
-    for l2 in list2:
-        calculated_dcn = calculate_dcn(list1[1], list2[l2], graph)
+    largest_dcn = None
+    for large_community_label in large_community_with_target_node:
+        calculated_dcn = calculate_dcn(target_node, large_community_with_target_node[large_community_label], graph)
         if calculated_dcn > max_dcn:
+            largest_dcn = large_community_label
             max_dcn = calculated_dcn
-            length = len(list1)
-            if length == 3:
-                list1.append([l2, list2[l2]])
-            else:
-                list1[length - 1] = [l2, list2[l2]]
-    return list1
+    return largest_dcn
 
 
-def set_small_community_inner_edge(small_communities, graph: Graph):
-    for small_community in small_communities:
-        counter = 0
-        for member in small_communities[small_community][0]:
-            neighbors = graph.get_node_neighbours(member)
-            for neighbor in neighbors:
-                if graph.get_node_current_label(neighbor) == small_community:
-                    counter += 1
-        small_communities[small_community].append(counter / 2)
-    return small_communities
+def get_small_community_inner_edge(small_community, small_community_label, graph: Graph):
+    counter = 0
+    # print(small_community)
+    for member in small_community:
+        neighbors = graph.get_node_neighbours(member)
+        # print(neighbors)
+        for neighbor in neighbors:
+            if graph.get_node_current_label(neighbor) == small_community_label:
+                counter += 1
+    return counter / 2
 
 
 def get_outer_edge(nodes, label, graph: Graph):
@@ -116,16 +120,13 @@ def merging_ability(inner_edge, outer_edge):
         return False
 
 
-def merging_list(merge_candidates, graph: Graph):
+def merging_list(merge_candidates, large_community_label, inner_edge, graph: Graph):
     need_to_update_list = dict()
-    label_of_large_community = merge_candidates[3][0]
-    all_nodes_in_candidate_community = merge_candidates[0]
-    if merging_ability(merge_candidates[2],
-                       get_outer_edge(all_nodes_in_candidate_community, label_of_large_community, graph)):
-        if label_of_large_community in need_to_update_list:
-            need_to_update_list[label_of_large_community] += merge_candidates[0]
+    if merging_ability(inner_edge, get_outer_edge(merge_candidates, large_community_label, graph)):
+        if large_community_label in need_to_update_list:
+            need_to_update_list[large_community_label] += merge_candidates
         else:
-            need_to_update_list[label_of_large_community] = merge_candidates[0]
+            need_to_update_list[large_community_label] = merge_candidates
 
     return need_to_update_list
 
@@ -136,17 +137,28 @@ def merging_operation(merge_list, graph: Graph):
             graph.set_label_to_node(label, node)
 
 
-def small_community_target_nodes(small_communities, graph: Graph):
-    small_community_containing_target_nodes = dict()  # one node from each small community with the biggest degree
-    for small_community in small_communities:
+def small_community_target_nodes(small_community, graph: Graph):
+    candidate_for_target_node_degree = 0
+    for node in small_community:
+        node_degree = graph.get_node_degree(node)
+        if node_degree >= candidate_for_target_node_degree:
+            candidate_for_target_node = node
+            candidate_for_target_node_degree = node_degree
+    return candidate_for_target_node
+
+
+def all_communities_with_target_nodes(communities, graph: Graph):
+    communities_with_target_node = dict()
+
+    for community in communities:
         candidate_for_target_node_degree = 0
-        small_community_containing_target_nodes[small_community] = [small_communities[small_community]]
-        for small_node in small_communities[small_community]:
-            if graph.get_node_degree(small_node) >= candidate_for_target_node_degree:
-                candidate_for_target_node = small_node
-                candidate_for_target_node_degree = graph.get_node_degree(small_node)
-        small_community_containing_target_nodes[small_community].append(candidate_for_target_node)
-    return small_community_containing_target_nodes
+        for node in communities[communities]:
+            node_degree = graph.get_node_degree(node)
+            if node_degree >= candidate_for_target_node_degree:
+                target_node = node
+                candidate_for_target_node_degree = node_degree
+
+    return target_node
 
 
 def large_community_target_nodes(large_communities, graph: Graph):
@@ -169,6 +181,7 @@ def get_communities(nodes, graph: Graph):
             communities[node_current_label] = [node]
         else:
             communities[node_current_label].append(node)
+    # print(communities)
     return communities
 
 
