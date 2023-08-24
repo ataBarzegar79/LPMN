@@ -4,7 +4,7 @@ from graph import Graph
 class Priority:
     def give_nodes_priority(self, graph: Graph) -> list:
         nodes = graph.get_nodes()
-        nodes_importance = self.method_two(nodes, graph)
+        nodes_importance = self.method_one(nodes, graph)
         return sorted(nodes_importance.items(), key=lambda x: x[1], reverse=True)
 
     def method_one(self, nodes, graph):  # Ata
