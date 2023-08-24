@@ -3,8 +3,11 @@ from graph import Graph
 
 def merge_algorithm(graph: Graph):
     nodes = graph.get_nodes()
+
+    # => O(n)
     communities = get_communities(nodes, graph)
 
+    # => O(c)
     small_communities = get_small_communities(nodes, communities)
     large_communities = get_large_communities(nodes, communities)
 
@@ -12,18 +15,20 @@ def merge_algorithm(graph: Graph):
     small_communities_with_inner_edge = set_small_community_inner_edge(
         small_community_target_nodes(small_communities, graph), graph)
 
-    # for s_community in small_communities_with_inner_edge:
     current_small_community = small_communities_with_inner_edge[list(small_communities_with_inner_edge.keys())[0]]
+
+    # => O(l_nodes)
     current_large_community = large_community_target_nodes(large_communities, graph)
+
     condition = True
     iter_limitation = len(small_communities)
     item_key = 0
-    # print("0:", small_communities)
+
+    # = >
     while condition:
         # => O(c)
         small_community_with_merge_candidate = return_largest_dcn(current_small_community, current_large_community,
                                                                   graph)
-
         # => O(s_nodes*k)
         need_to_update_list = merging_list(small_community_with_merge_candidate, graph)
 
@@ -31,10 +36,14 @@ def merge_algorithm(graph: Graph):
             # => O(s_nodes) -> worst scenario
             merging_operation(need_to_update_list, graph)
 
+            # => O(n)
             communities = get_communities(nodes, graph)
 
+            # => O(c)
             small_communities = get_small_communities(nodes, communities)
             large_communities = get_large_communities(nodes, communities)
+
+            # => O(s_nodes * k)
             small_communities_with_inner_edge = set_small_community_inner_edge(
                 small_community_target_nodes(small_communities, graph), graph)
 
@@ -44,8 +53,6 @@ def merge_algorithm(graph: Graph):
             current_large_community = large_community_target_nodes(large_communities, graph)
             iter_limitation = len(small_communities)
             item_key = 0
-            # print(current_large_community)
-            # print("1:", small_communities)
         else:
             item_key += 1
             if len(small_communities_with_inner_edge) > item_key:
@@ -79,19 +86,9 @@ def return_largest_dcn(list1, list2, graph: Graph):
     return list1
 
 
-def get_inner_edge(node, graph: Graph):
-    target_node_current_label = graph.get_node_current_label(node)
-    target_node_neighbors = graph.get_node_neighbours(node)
-    counter = 0
-    for neighbor in target_node_neighbors:
-        if graph.get_node_current_label(node) == target_node_current_label:
-            counter += 1
-    return counter
-
-
 def set_small_community_inner_edge(small_communities, graph: Graph):
-    counter = 0
     for small_community in small_communities:
+        counter = 0
         for member in small_communities[small_community][0]:
             neighbors = graph.get_node_neighbours(member)
             for neighbor in neighbors:
@@ -113,7 +110,7 @@ def get_outer_edge(nodes, label, graph: Graph):
 
 def merging_ability(inner_edge, outer_edge):
     # print(inner_edge, outer_edge)
-    if (inner_edge / 2) - outer_edge < 0:
+    if (inner_edge / 2) < outer_edge:
         return True
     else:
         return False

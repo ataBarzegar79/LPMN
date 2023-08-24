@@ -39,6 +39,7 @@ if __name__ == "__main__":
         algorithm_start_time = time.time()
         iteration_count = hup_lpa.perform_algorithm()
         algorithm_finish_time = time.time()
+        # graph.draw_graph()
 
         print('data set   : ', dataset)
         print('algorithm executed in  :', algorithm_finish_time - algorithm_start_time)

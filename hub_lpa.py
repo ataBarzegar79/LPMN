@@ -38,4 +38,4 @@ class HubLpa:
 
     def get_new_label_of_node(self, node: int, clustering: dict, page_rank: dict) -> int:
         label_update = LabelUpdate()
-        return label_update.retrieve_new_label(node, self.graph,clustering,page_rank)
+        return label_update.retrieve_new_label(node, self.graph, clustering, page_rank)
