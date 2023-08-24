@@ -61,6 +61,7 @@ def merge_algorithm(graph: Graph):
             iter_limitation -= 1
         if iter_limitation == 0:
             condition = False
+    # graph.set_label_to_node(13, 39)
 
 
 def calculate_dcn(node_v, node_i, graph: Graph):  # this is really ok
