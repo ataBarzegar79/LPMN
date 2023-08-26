@@ -4,6 +4,8 @@ from graph import Graph
 def merge_algorithm(graph: Graph):
     nodes = graph.get_nodes()
 
+    all_nodes_neighbors = all_nodes_neighbors_list(nodes, graph)
+
     # => O(n)
     communities = get_communities(nodes, graph)
 
@@ -18,11 +20,13 @@ def merge_algorithm(graph: Graph):
     small_community_label = list(small_communities.keys())[item_key]
     small_community = small_communities[small_community_label]
     target_node = small_community[1]
-    inner_edge = get_small_community_inner_edge(small_community, small_community_label, graph)
+    inner_edge = get_small_community_inner_edge(small_community, small_community_label, all_nodes_neighbors, graph)
 
     target_node_of_large_communities = large_community_target_nodes(large_communities)
 
+    count = 0
     while condition:
+        count += 1
         # => O(c)
         large_community_label = return_largest_dcn(target_node, target_node_of_large_communities, graph)
         # => O(s_nodes*k)
@@ -48,7 +52,8 @@ def merge_algorithm(graph: Graph):
             small_community_label = list(small_communities.keys())[item_key]
             small_community = small_communities[small_community_label]
             target_node = small_community[1]
-            inner_edge = get_small_community_inner_edge(small_community, small_community_label, graph)
+            inner_edge = get_small_community_inner_edge(small_community, small_community_label, all_nodes_neighbors,
+                                                        graph)
 
             target_node_of_large_communities = large_community_target_nodes(large_communities)
         else:
@@ -57,7 +62,8 @@ def merge_algorithm(graph: Graph):
                 small_community_label = list(small_communities.keys())[item_key]
                 small_community = small_communities[small_community_label]
                 target_node = small_community[1]
-                inner_edge = get_small_community_inner_edge(small_community, small_community_label, graph)
+                inner_edge = get_small_community_inner_edge(small_community, small_community_label, all_nodes_neighbors,
+                                                            graph)
 
                 target_node_of_large_communities = large_community_target_nodes(large_communities)
             iter_limitation -= 1
@@ -85,14 +91,25 @@ def return_largest_dcn(target_node, large_community_with_target_node, graph: Gra
     return largest_dcn
 
 
-def get_small_community_inner_edge(small_community, small_community_label, graph: Graph):
+def get_small_community_inner_edge(small_community, small_community_label, all_nodes_neighbors, graph: Graph):
     counter = 0
     for member in small_community[0]:
-        neighbors = graph.get_node_neighbours(member)
-        for neighbor in neighbors:
+        for neighbor in all_nodes_neighbors[member]:
             if graph.get_node_current_label(neighbor) == small_community_label:
                 counter += 1
     return counter / 2
+
+
+def all_nodes_neighbors_list(nodes, graph: Graph):
+    neighbors_list = dict()
+    for node in nodes:
+        neighbors = graph.get_node_neighbours(node)
+        for neighbor in neighbors:
+            if node not in neighbors_list:
+                neighbors_list[node] = [neighbor]
+            elif neighbor not in neighbors_list[node]:
+                neighbors_list[node].append(neighbor)
+    return neighbors_list
 
 
 def get_outer_edge(nodes, label, graph: Graph):
