@@ -36,8 +36,6 @@ class HubLpa:
                 break
             if counter > 10:
                 break
-
-        # merge_phase.merge_algorithm(self.graph)
         return counter
 
     def get_important_nodes(self, nodes_additional_data: dict):
