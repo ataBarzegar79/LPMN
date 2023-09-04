@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     # lfr
 
-    MU = 0.8
+    MU = 0.1
     graphs = [
         Graph(
             LFR_benchmark_graph(5000, min_degree=20, max_degree=50, min_community=20, max_community=50, tau2=2, tau1=2,
