@@ -1,6 +1,5 @@
 import networkx as nx
-import graph
-import merge_phase
+from merge_phase import MergePhase
 from graph import Graph
 from prioroty import Priority
 from label_update import LabelUpdate
@@ -36,6 +35,8 @@ class HubLpa:
                 break
             if counter > 10:
                 break
+            merge = MergePhase(graph=self.graph,additional_data=nodes_additional_data)
+            merge.merge_algorithm()
         return counter
 
     def get_important_nodes(self, nodes_additional_data: dict):
