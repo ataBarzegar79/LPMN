@@ -1,4 +1,5 @@
 import os
+import re
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -83,9 +84,9 @@ class Graph:
         base_graph = nx.Graph()
         with open(self.graph_file_path, 'r') as file:
             for line in file:
-                values = line.strip().split('\t')
+                values = re.split(r'\s+', line.strip())
                 node = values[0]
-                neighbours = values[1:]
+                neighbours = [str(item) for item in values[1:]]
                 raw_data += [(int(node), int(neighbor)) for neighbor in neighbours]
         base_graph.add_edges_from(raw_data)
         return base_graph
