@@ -15,40 +15,43 @@ def merge_algorithm(graph: Graph, nodes_additional_data):
         target_node_of_large_communities = large_community_target_nodes(large_communities)
         communities_end = time.time()
 
-        print('communities found in : ', communities_end - communities_start)
+        # print('communities found in : ', communities_end - communities_start)
 
         for small_community_label in small_communities:
             small_community = small_communities[small_community_label]
             target_node = small_community[1]
 
             inner_edge_start = time.time()
-            inner_edge = get_small_community_inner_edge(small_community, small_community_label, nodes_additional_data,
-                                                        graph)
+            inner_edge_and_large_neighbors = get_small_community_inner_edge(small_community, small_community_label,
+                                                                            nodes_additional_data, large_communities,
+                                                                            graph)
             inner_edge_end = time.time()
-            print('inner_edge finished in : ', inner_edge_end - inner_edge_start)
+            # print('inner_edge finished in : ', inner_edge_end - inner_edge_start)
 
             dcn_started = time.time()
             large_community_label = return_largest_dcn(target_node, target_node_of_large_communities,
+                                                       inner_edge_and_large_neighbors,
                                                        nodes_additional_data, graph)
             dcn_ended = time.time()
 
-            print('dcn calculated in : ', dcn_ended - dcn_started)
+            # print('dcn calculated in : ', dcn_ended - dcn_started)
 
             merge_list_started = time.time()
-            need_to_update_list = merging_list(small_community[0], large_community_label, inner_edge,
+            need_to_update_list = merging_list(small_community[0], large_community_label,
+                                               inner_edge_and_large_neighbors['inner_edge'],
                                                nodes_additional_data, graph)
             merge_list_ended = time.time()
 
-            print('merge list founded in : ', merge_list_ended - merge_list_started)
+            # print('merge list founded in : ', merge_list_ended - merge_list_started)
 
             if need_to_update_list:
                 merge_operation_started = time.time()
                 merging_operation(need_to_update_list, graph)
                 merge_operation_ended = time.time()
 
-                print('merge operation finished in : ', merge_operation_ended - merge_operation_started)
+                # print('merge operation finished in : ', merge_operation_ended - merge_operation_started)
         iter_end_merge = time.time()
-        print('merging iteration finished in : ', iter_end_merge - iter_start_merge)
+        # print('merging iteration finished in : ', iter_end_merge - iter_start_merge)
 
 
 def calculate_dcn(node_v, node_i, nodes_additional_data, graph: Graph):  # this is really ok
@@ -60,10 +63,11 @@ def calculate_dcn(node_v, node_i, nodes_additional_data, graph: Graph):  # this 
     return degree + (2 * common_neighbors_count)
 
 
-def return_largest_dcn(target_node, large_community_with_target_node, nodes_additional_data, graph: Graph):
+def return_largest_dcn(target_node, large_community_with_target_node, large_neighbors, nodes_additional_data,
+                       graph: Graph):
     max_dcn = 0
     largest_dcn = None
-    for large_community_label in large_community_with_target_node:
+    for large_community_label in large_neighbors['large_neighbors']:
         calculated_dcn = calculate_dcn(target_node, large_community_with_target_node[large_community_label],
                                        nodes_additional_data, graph)
         if calculated_dcn > max_dcn:
@@ -72,17 +76,27 @@ def return_largest_dcn(target_node, large_community_with_target_node, nodes_addi
     return largest_dcn
 
 
-def get_small_community_inner_edge(small_community, small_community_label, all_nodes_additional_data, graph: Graph):
+def get_small_community_inner_edge(small_community, small_community_label, all_nodes_additional_data, large_communities,
+                                   graph: Graph):
     counter = 0
+    inner_edge_and_neighbor_large_communities = {
+        'inner_edge': 0,
+        'large_neighbors': set()
+    }
     for member in small_community[0]:
         for neighbor in all_nodes_additional_data[member]['neighbours']:
-            if graph.get_node_current_label(neighbor) == small_community_label:
+            neighbor_label = graph.get_node_current_label(neighbor)
+            if neighbor_label in large_communities:
+                inner_edge_and_neighbor_large_communities['large_neighbors'].add(neighbor_label)
+            if neighbor_label == small_community_label:
                 counter += 1
-    return counter / 2
+    inner_edge_and_neighbor_large_communities['inner_edge'] = counter / 2
+    return inner_edge_and_neighbor_large_communities
 
 
 def get_outer_edge(nodes, label, nodes_additional_data, graph: Graph):
     counter = 0
+
     for node in nodes:
         for neighbor in nodes_additional_data[node]['neighbours']:
             if graph.get_node_current_label(neighbor) == label:

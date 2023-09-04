@@ -45,7 +45,7 @@
       "file_format": "txt",
       "grand_truth_file_path": "./samples/grand_truth/amazon_nodes_map.txt",
       "order_format": "edge-list",
-      "calculate": false,
+      "calculate": true,
       "large_community": true
     },
     "./samples/datasets/email_enron.txt": {
@@ -53,7 +53,7 @@
       "file_format": "txt",
       "grand_truth_file_path": "",
       "order_format": "edge-list",
-      "calculate": false,
+      "calculate": true,
       "large_community": false
     },
     "./samples/datasets/youtube.txt": {
@@ -61,7 +61,7 @@
       "file_format": "txt",
       "grand_truth_file_path": "./samples/grand_truth/youtube_nodes_map.txt",
       "order_format": "edge-list",
-      "calculate": false,
+      "calculate": true,
       "large_community": true
     }
   }
