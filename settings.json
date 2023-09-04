@@ -1,17 +1,68 @@
 {
   "data_sets": {
-    "base_datas": {
-      "./samples/datasets/base_datas/dolphins.gml": "./samples/grand_truth/base_datas/dolphins_real_labels.txt",
-      "./samples/datasets/base_datas/football.gml": "./samples/grand_truth/base_datas/football_real_labels.txt",
-      "./samples/datasets/base_datas/karate.gml": "./samples/grand_truth/base_datas/karate_real_labels.txt",
-      "./samples/datasets/base_datas/polbooks.gml": "./samples/grand_truth/base_datas/polbooks_real_labels.txt"
+    "./samples/datasets/karate.gml": {
+      "name": "karate",
+      "file_format": "gml",
+      "grand_truth_file_path": "./samples/grand_truth/karate_real_labels.txt",
+      "order_format": "basic-gml",
+      "calculate": true,
+      "large_community": false
     },
-    "big_scale_datas": {
-      "./samples/datasets/big_scale_datas/amazon.txt": ""
+    "./samples/datasets/football.gml": {
+      "name": "football",
+      "file_format": "gml",
+      "grand_truth_file_path": "./samples/grand_truth/football_real_labels.txt",
+      "order_format": "basic-gml",
+      "calculate": true,
+      "large_community": false
     },
-    "lfr": {
-      "./samples/lfr/5k-network.dat": "./samples/lfr/5k-community.dat"
+    "./samples/datasets/pol-books.gml": {
+      "name": "pol-books",
+      "file_format": "gml",
+      "grand_truth_file_path": "./samples/grand_truth/pol-books_real_labels.txt",
+      "order_format": "basic-gml",
+      "calculate": true,
+      "large_community": false
+    },
+    "./samples/datasets/dolphins.gml": {
+      "name": "dolphins",
+      "file_format": "gml",
+      "grand_truth_file_path": "./samples/grand_truth/dolphins_real_labels.txt",
+      "order_format": "basic-gml",
+      "calculate": true,
+      "large_community": false
+    },
+    "./samples/datasets/dblp.txt": {
+      "name": "dblp",
+      "file_format": "txt",
+      "grand_truth_file_path": "./samples/grand_truth/dblp_nodes_map.txt",
+      "order_format": "edge-list",
+      "calculate": true,
+      "large_community": true
+    },
+    "./samples/datasets/amazon.txt": {
+      "name": "amazon",
+      "file_format": "txt",
+      "grand_truth_file_path": "./samples/grand_truth/amazon_nodes_map.txt",
+      "order_format": "edge-list",
+      "calculate": true,
+      "large_community": true
+    },
+    "./samples/datasets/email_enron.txt": {
+      "name": "email - enron ",
+      "file_format": "txt",
+      "grand_truth_file_path": "",
+      "order_format": "edge-list",
+      "calculate": true,
+      "large_community": false
+    },
+    "./samples/datasets/youtube.txt": {
+      "name": "youtube ",
+      "file_format": "txt",
+      "grand_truth_file_path": "./samples/grand_truth/youtube_nodes_map.txt",
+      "order_format": "edge-list",
+      "calculate": true,
+      "large_community": true
     }
-  },
-  "data_set_chosen": "BASE"
+  }
 }

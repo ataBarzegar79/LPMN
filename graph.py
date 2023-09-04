@@ -1,28 +1,30 @@
 import os
-import re
-
+from graph_order import GraphOrder
+from file_format import FileFormat
 import networkx as nx
 import matplotlib.pyplot as plt
 
 
-# noinspection PyMethodMayBeStatic
 # as we are using networkx package
 # graph class is just a wrapper !
 class Graph:
-
-    def __init__(self, graph_file_path):
-        self.file_format_readers = {
-            '.txt': self.read_from_text,
-            '.gml': self.read_from_gml,
-            '.dat': self.read_from_dat,
+    readers = {
+        FileFormat.TXT: {
+            GraphOrder.NEIGHBOR_BASE: 'read_from_neighbors_txt',
+            GraphOrder.EDGE_LIST: 'read_from_edge_list_txt'
+        },
+        FileFormat.GML: {
+            GraphOrder.BASIC_GML: 'read_from_gml'
         }
+    }
 
-        if isinstance(graph_file_path, str):
-            self.graph = None
-            self.graph_file_path = graph_file_path
-            self.read_graph_from_path()
-        else:
+    def __init__(self, graph_file_path, order_format: GraphOrder, file_format: FileFormat):
+        if file_format == FileFormat.NETWORKX_GRAPH:
             self.graph = graph_file_path
+        else:
+            self.graph_file_path = graph_file_path
+            self.graph = getattr(self, Graph.readers[file_format][order_format])()
+
         self.colors = [
             '#C0C0C0', '#FF0000', '#800080', '#00FF00', '#FAEBD7',
             '#D2691E', '#00FFFF', '#BDB76B', '#9932CC', '#FF1493',
@@ -79,17 +81,20 @@ class Graph:
         file_format = os.path.splitext(self.graph_file_path)[1]
         self.graph = self.file_format_readers[file_format]()
 
-    def read_from_text(self):
+    def read_from_neighbors_txt(self):
         raw_data = []
         base_graph = nx.Graph()
         with open(self.graph_file_path, 'r') as file:
             for line in file:
-                values = re.split(r'\s+', line.strip())
+                values = line.strip().split('\t')
                 node = values[0]
-                neighbours = [str(item) for item in values[1:]]
+                neighbours = values[1:]
                 raw_data += [(int(node), int(neighbor)) for neighbor in neighbours]
         base_graph.add_edges_from(raw_data)
         return base_graph
+
+    def read_from_edge_list_txt(self):
+        return nx.read_edgelist(self.graph_file_path, nodetype=int)
 
     def read_from_gml(self):
         return nx.read_gml(self.graph_file_path, label='id')
