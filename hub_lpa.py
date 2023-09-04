@@ -1,3 +1,5 @@
+import time
+
 import networkx as nx
 import graph
 import merge_phase
@@ -36,7 +38,9 @@ class HubLpa:
                 break
             if counter > 10:
                 break
+        merg_start = time.time()
         merge_phase.merge_algorithm(self.graph, nodes_additional_data)
+        print('merge finished at : ', time.time()-merg_start)
         return counter
 
     def get_important_nodes(self, nodes_additional_data: dict):
