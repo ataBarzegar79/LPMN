@@ -39,7 +39,7 @@ class HubLpa:
             if counter > 10:
                 break
         merge_start = time.time()
-        merge_phase.merge_algorithm(self.graph, nodes_additional_data)
+        merge_phase.merge_algorithm(self.graph, nodes_additional_data, page_rank)
         print('merge finished at : ', time.time() - merge_start)
         return counter
 
