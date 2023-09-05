@@ -22,9 +22,9 @@ class MergePhase:
         for node in self.nodes:
             node_label = self.graph.get_node_current_label(node=node)
             if node_label not in communities:
-                communities[node_label] = 1
+                communities[node_label] = [node]
             else:
-                communities[node_label] += 1
+                communities[node_label].append(node)
         return communities
 
     def get_community_average_size(self, current_communities) -> int:
@@ -37,8 +37,6 @@ class MergePhase:
         }
         for community in current_communities:
             community_nodes = current_communities[community]
-            print(community_nodes)
-            exit()
             community_size = len(community_nodes)
             if community_size <= self.community_average_size:
                 community_extent = 'small'
@@ -63,34 +61,35 @@ class MergePhase:
             community_nodes = small_communities[community]['nodes']
             small_community_align_large_communities = set()
             for node in community_nodes:
-                node_neighbors = self.additional_data[node]['neighbors']
+                node_neighbors = self.additional_data[node]['neighbours']
                 for neighbor in node_neighbors:
                     neighbor_label = self.graph.get_node_current_label(node=neighbor)
                     if neighbor_label in large_communities:
-                        small_community_align_large_communities.update(neighbor_label)
+                        small_community_align_large_communities.add(neighbor_label)
             max_large_community = (0, 0)
             small_candidate = small_communities[community]['candid_node']
             for large_community in small_community_align_large_communities:
-                large_candidate = large_community[large_community]['candid_node']
+                large_candidate = large_communities[large_community]['candid_node']
                 mutuality_score = self.find_mutuality_score_between_candidates(c1=small_candidate, c2=large_candidate)
-                if mutuality_score > max_large_community[2]:
+                if mutuality_score > max_large_community[1]:
                     max_large_community = (large_community, mutuality_score)
-            if (self.large_community_should_merge_to_small(small_members=community_nodes,
-                                                           large_members=large_communities[max_large_community[0]][
-                                                               'nodes'])):
-                for node in community_nodes:
-                    self.graph.set_label_to_node(max_large_community[0], node)
+            if max_large_community != (0, 0):
+                if (self.large_community_should_merge_to_small(small_members=community_nodes,
+                                                               large_members=large_communities[max_large_community[0]][
+                                                                   'nodes'])):
+                    for node in community_nodes:
+                        self.graph.set_label_to_node(max_large_community[0], node)
 
     def find_mutuality_score_between_candidates(self, c1, c2):
         return len(
-            set(self.graph.get_node_neighbours(c1)).intersection(self.graph.get_node_neighbours(c2))
+            set(self.additional_data[c1]['neighbours']).intersection(self.additional_data[c2]['neighbours'])
         )
 
     def large_community_should_merge_to_small(self, small_members, large_members):
         count_inner = 0
         count_outer = 0
         for member in small_members:
-            for neighbor in self.additional_data[member]['neighbors']:
+            for neighbor in self.additional_data[member]['neighbours']:
                 if neighbor in small_members:
                     count_inner += 1
                 else:
