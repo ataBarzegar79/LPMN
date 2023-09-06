@@ -5,7 +5,7 @@
       "file_format": "gml",
       "grand_truth_file_path": "./samples/grand_truth/karate_real_labels.txt",
       "order_format": "basic-gml",
-      "calculate": false,
+      "calculate": true,
       "large_community": false
     },
     "./samples/datasets/football.gml": {
@@ -13,7 +13,7 @@
       "file_format": "gml",
       "grand_truth_file_path": "./samples/grand_truth/football_real_labels.txt",
       "order_format": "basic-gml",
-      "calculate": false,
+      "calculate": true,
       "large_community": false
     },
     "./samples/datasets/pol-books.gml": {
@@ -21,7 +21,7 @@
       "file_format": "gml",
       "grand_truth_file_path": "./samples/grand_truth/pol-books_real_labels.txt",
       "order_format": "basic-gml",
-      "calculate": false,
+      "calculate": true,
       "large_community": false
     },
     "./samples/datasets/dolphins.gml": {
@@ -29,15 +29,39 @@
       "file_format": "gml",
       "grand_truth_file_path": "./samples/grand_truth/dolphins_real_labels.txt",
       "order_format": "basic-gml",
-      "calculate": false,
+      "calculate": true,
       "large_community": false
+    },
+    "./samples/datasets/grid.gml": {
+      "name": "grid",
+      "file_format": "gml",
+      "grand_truth_file_path": "",
+      "order_format": "basic-gml",
+      "calculate": true,
+      "large_community": false
+    },
+    "./samples/datasets/net.gml": {
+      "name": "net science",
+      "file_format": "gml",
+      "grand_truth_file_path": "",
+      "order_format": "basic-gml",
+      "calculate": true,
+      "large_community": false
+    },
+    "./samples/datasets/pgp.txt": {
+      "name": "pgp",
+      "file_format": "txt",
+      "grand_truth_file_path": "",
+      "order_format": "edge-list",
+      "calculate": true,
+      "large_community": true
     },
     "./samples/datasets/dblp.txt": {
       "name": "dblp",
       "file_format": "txt",
       "grand_truth_file_path": "./samples/grand_truth/dblp_nodes_map.txt",
       "order_format": "edge-list",
-      "calculate": false,
+      "calculate": true,
       "large_community": true
     },
     "./samples/datasets/amazon.txt": {
@@ -45,7 +69,7 @@
       "file_format": "txt",
       "grand_truth_file_path": "./samples/grand_truth/amazon_nodes_map.txt",
       "order_format": "edge-list",
-      "calculate": false,
+      "calculate": true,
       "large_community": true
     },
     "./samples/datasets/email_enron.txt": {
@@ -53,7 +77,23 @@
       "file_format": "txt",
       "grand_truth_file_path": "",
       "order_format": "edge-list",
-      "calculate": false,
+      "calculate": true,
+      "large_community": false
+    },
+    "./samples/datasets/cond-mat-2003.gml": {
+      "name": "condmat 2003",
+      "file_format": "gml",
+      "grand_truth_file_path": "",
+      "order_format": "basic-gml",
+      "calculate": true,
+      "large_community": false
+    },
+    "./samples/datasets/cond-mat-2005.gml": {
+      "name": "condmat 2005",
+      "file_format": "gml",
+      "grand_truth_file_path": "",
+      "order_format": "basic-gml",
+      "calculate": true,
       "large_community": false
     },
     "./samples/datasets/youtube.txt": {
@@ -61,7 +101,7 @@
       "file_format": "txt",
       "grand_truth_file_path": "./samples/grand_truth/youtube_nodes_map.txt",
       "order_format": "edge-list",
-      "calculate": false,
+      "calculate": true,
       "large_community": true
     },
     "./samples/datasets/LFR/LFR1_1.txt": {
