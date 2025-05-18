@@ -2,3 +2,5 @@
 ./settings.json
 .idea/*
 .idea
+env
+env/*
