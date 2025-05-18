@@ -1,3 +1,4 @@
 *.png
 ./settings.json
+.idea/*
 .idea
